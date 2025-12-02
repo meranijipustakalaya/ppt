@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>मेरा छोटा-सा निजी पुस्तकालय</title>
+    
+    <!-- 1. Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. Configure Imports for React and Lucide -->
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "lucide-react": "https://esm.sh/lucide-react@0.292.0"
+      }
+    }
+    </script>
+    
+    <!-- 3. Load Babel to translate JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Custom Font Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap');
+        
+        .font-hindi { font-family: 'Tiro Devanagari Hindi', serif; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+        
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-fade-in { animation: fadeIn 1s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <div id="root"></div>
+
+    <!-- 4. Your React Code -->
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { 
+            Book, Heart, Activity, Battery, User, Home, Feather, 
+            Coffee, Star, Award, MapPin, Film, Ticket, 
+            DollarSign, Smile, ChevronRight, ChevronLeft,
+            Library, Monitor, Zap, BookOpen, Anchor, Cloud, 
+            Compass, Droplet, Sun, Users, GraduationCap, XCircle,
+            Maximize2, Minimize2, Play, Type, Image as ImageIcon
+        } from 'lucide-react';
+
+        // --- Slide Data Structure ---
+        const SLIDES = [
+            // --- PART 1: The Crisis (1989) ---
+            {
+                id: 1,
+                type: 'hero',
+                title: "मेरा छोटा-सा निजी पुस्तकालय",
+                subtitle: "लेखक: धर्मवीर भारती",
+                content: ["एक आत्मकथात्मक यात्रा: मृत्यु के मुख से जीवन की वापसी तक"],
+                explanation: "यह कहानी केवल किताबों के संग्रह की नहीं है, बल्कि यह बताती है कि कैसे साहित्य किसी इंसान के प्राणों का आधार बन सकता है।",
+                image: "1.jpg",
+                color: "from-slate-900 to-blue-950",
+                accent: "text-blue-400",
+                icon: Library
+            },
+            {
+                id: 2,
+                type: 'split',
+                title: "जुलाई 1989 का संकट",
+                content: [
+                "लेखक को लगातार तीन भीषण हार्ट अटैक आए।",
+                "नब्ज़, साँस और धड़कन सब बंद हो गई थी।",
+                "डॉक्टरों ने 'मृत' घोषित कर दिया था।"
+                ],
+                explanation: "यह घटना अध्याय की भूमिका है। स्थिति इतनी गंभीर थी कि बचने की कोई उम्मीद नहीं बची थी। यह जीवन और मृत्यु के बीच का क्षण था।",
+                image: "2.jpg",
+                color: "from-red-950 to-slate-900",
+                accent: "text-red-500",
+                icon: Activity
+            },
+            {
+                id: 3,
+                type: 'split_reverse',
+                title: "डॉक्टर बोर्जेस का दुस्साहस",
+                content: [
+                "डॉक्टर ने हार नहीं मानी और एक 'भयानक प्रयोग' किया।",
+                "900 वॉल्ट्स के बिजली के झटके (Shocks) दिए।",
+                "तर्क: यदि शरीर मृत है तो दर्द नहीं होगा, पर यदि प्राण शेष हैं तो दिल चल पड़ेगा।"
+                ],
+                explanation: "यह चिकित्सा विज्ञान और मानवीय आशा का संघर्ष था। डॉक्टर बोर्जेस का यह निर्णय लेखक के पुनर्जीवन का कारण बना।",
+                image: "3.jpg",
+                color: "from-indigo-950 to-slate-900",
+                accent: "text-yellow-400",
+                icon: Zap
+            },
+            {
+                id: 4,
+                type: 'card',
+                title: "क्षतिग्रस्त हृदय की स्थिति",
+                content: [
+                "प्राण तो लौटे, पर 60% हृदय सदा के लिए नष्ट हो गया।",
+                "केवल 40% हृदय बचा, उसमें भी तीन अवरोध (Blockages)।",
+                "ओपन हार्ट सर्जरी ज़रूरी थी, पर सर्जन डर रहे थे।"
+                ],
+                explanation: "जीवन तो बच गया, लेकिन वह एक धागे पर लटका था। सर्जरी से पहले शरीर को स्थिर करना ज़रूरी था, इसलिए उन्हें घर भेजा गया।",
+                color: "from-rose-950 to-slate-900",
+                accent: "text-rose-500",
+                icon: Heart
+            },
+            {
+                id: 5,
+                type: 'hero_alt',
+                title: "किताबों वाले कमरे की ज़िद",
+                subtitle: "अर्धमृत्यु अवस्था में घर वापसी",
+                content: ["लेखक ने बेडरूम में लेटने से साफ मना कर दिया।", "ज़िद: 'मुझे मेरे किताबों वाले कमरे में ही रखा जाए।'"],
+                explanation: "यह एक सामान्य ज़िद नहीं थी। लेखक को लगता था कि बेडरूम में मृत्यु का सन्नाटा है, जबकि लाइब्रेरी में जीवन का स्पंदन है।",
+                image: "4.jpg",
+                color: "from-blue-950 to-slate-900",
+                accent: "text-blue-300",
+                icon: Book
+            },
+            {
+                id: 6,
+                type: 'split',
+                title: "जीवन और मृत्यु का दृश्य",
+                content: [
+                    "खिड़की के बाहर: हवा में झूलते सुपारी के पेड़ के पत्ते।",
+                    "कमरे के अंदर: फ़र्श से छत तक किताबों से भरी अलमारियाँ।",
+                    "लेखक दिन-भर इन्हीं दो चीज़ों को देखते रहते थे।"
+                ],
+                explanation: "बाहर प्रकृति थी और अंदर ज्ञान। दोनों ही जीवन के प्रतीक थे जो लेखक को घेरे हुए थे।",
+                image: "5.jpg",
+                color: "from-emerald-900 to-slate-900",
+                accent: "text-emerald-300",
+                icon: Home
+            },
+            {
+                id: 7,
+                type: 'quote',
+                title: "प्राणों का रहस्य",
+                quote: "जैसे राजा के प्राण तोते में थे, वैसे ही मेरे प्राण इन हज़ारों किताबों में बसे हैं।",
+                content: ["शरीर: नश्वर और टूटा हुआ।", "किताबें: पिछले 40-50 वर्षों की संचित ऊर्जा।"],
+                explanation: "लेखक यहाँ एक रूपक (Metaphor) का प्रयोग करते हैं। उन्हें विश्वास था कि जब तक वे किताबों के बीच हैं, मृत्यु उन्हें छू नहीं सकती।",
+                color: "from-teal-950 to-slate-900",
+                accent: "text-teal-400",
+                icon: Feather
+            },
+
+            // --- PART 2: Childhood Roots ---
+            {
+                id: 8,
+                type: 'grid',
+                title: "बचपन और पारिवारिक संस्कार",
+                content: [
+                "पिता: आर्य समाज रानीमंडी के प्रधान।",
+                "माँ: आदर्श कन्या पाठशाला की संस्थापिका।",
+                "माहौल: घर में बौद्धिक और सुधारवादी वातावरण था।"
+                ],
+                explanation: "लेखक का जन्म एक ऐसे परिवार में हुआ जहाँ शिक्षा और समाज सुधार को धन से अधिक महत्व दिया जाता था।",
+                image: "6.jpg",
+                color: "from-orange-950 to-slate-900",
+                accent: "text-orange-400",
+                icon: Users
+            },
+            {
+                id: 9,
+                type: 'split',
+                title: "पिता का महान त्याग",
+                content: [
+                "पिता की अच्छी सरकारी नौकरी थी और खूब कमाई थी।",
+                "गांधी जी के आह्वान पर उन्होंने नौकरी छोड़ दी।",
+                "परिणाम: घर की आर्थिक स्थिति बहुत बिगड़ गई।"
+                ],
+                explanation: "यह बताता है कि सिद्धांतों के लिए कष्ट सहना उन्हें विरासत में मिला था। आर्थिक तंगी के बावजूद मानसिक समृद्धि बनी रही।",
+                image: "7.jpg",
+                color: "from-stone-950 to-slate-900",
+                accent: "text-stone-400",
+                icon: User
+            },
+            {
+                id: 10,
+                type: 'list',
+                title: "गरीबी में भी साहित्य का वास",
+                content: [
+                "नियमित पत्रिकाएँ: 'आर्यमित्र', 'वेदोदम', 'सरस्वती', 'गृहिणी'।",
+                "बच्चों के लिए: 'बालसखा' और 'चमचम'।",
+                "महत्व: खाने के लाले पड़ सकते थे, पर ज्ञान की भूख मिटाना ज़रूरी था।"
+                ],
+                explanation: "तंगी के दौर में भी पत्रिकाओं का आना बंद नहीं हुआ। इसने लेखक के मन में पढ़ने की नींव डाली।",
+                color: "from-violet-950 to-slate-900",
+                accent: "text-violet-400",
+                icon: BookOpen
+            },
+            {
+                id: 11,
+                type: 'card',
+                title: "पढ़ने की 'चाट' (लत)",
+                content: [
+                "लेखक खाना खाते समय भी थाली के पास पत्रिका रखकर पढ़ते थे।",
+                "परियों और राजकुमारों की कहानियों में खोए रहते थे।",
+                "बड़ों की किताबें ('सत्यार्थ प्रकाश') भी पढ़ने की कोशिश करते।"
+                ],
+                explanation: "यह केवल शौक नहीं, एक नशा (Addiction) बन गया था। बालमन कल्पना लोक में विचरता रहता था।",
+                color: "from-amber-900 to-slate-900",
+                accent: "text-amber-400",
+                icon: Coffee
+            },
+            {
+                id: 12,
+                type: 'split_reverse',
+                title: "घर की पुस्तकें",
+                content: [
+                    "उपनिषद और उनके हिंदी अनुवाद।",
+                    "'सत्यार्थ प्रकाश' (दयानंद सरस्वती)।",
+                    "लेखक को 'सत्यार्थ प्रकाश' पूरी तरह समझ नहीं आती थी, पर पढ़ने में मज़ा आता था।"
+                ],
+                explanation: "बचपन से ही भारी-भरकम विषयों से परिचय ने लेखक की भाषाई पकड़ मजबूत की।",
+                color: "from-yellow-900 to-slate-900",
+                accent: "text-yellow-300",
+                icon: Book
+            },
+
+            // --- PART 3: Swami Dayanand's Influence ---
+            {
+                id: 13,
+                type: 'hero_alt',
+                title: "सबसे प्रिय पुस्तक",
+                subtitle: "स्वामी दयानंद की सचित्र जीवनी",
+                content: ["रोचक शैली में लिखी गई।", "अनेक चित्रों से सुसज्जित।"],
+                explanation: "सत्यार्थ प्रकाश कठिन थी, लेकिन यह जीवनी सचित्र होने के कारण बालक को बहुत प्रिय थी। इसने उनके चरित्र निर्माण में बड़ी भूमिका निभाई।",
+                image: "8.jpg",
+                color: "from-yellow-950 to-slate-900",
+                accent: "text-yellow-500",
+                icon: Star
+            },
+            {
+                id: 14,
+                type: 'split_reverse',
+                title: "घटना 1: मूर्ति पूजा और तर्क",
+                content: [
+                "दृश्य: चूहे को भगवान का भोग खाते देखना।",
+                "निष्कर्ष: प्रतिमाएँ भगवान नहीं होतीं।",
+                "प्रभाव: तर्कशक्ति का विकास और पाखंड का खंडन।"
+                ],
+                explanation: "इस एक घटना ने लेखक को सिखाया कि आँख मूंदकर विश्वास करने के बजाय तर्क करना चाहिए।",
+                image: "9.jpg",
+                color: "from-cyan-950 to-slate-900",
+                accent: "text-cyan-400",
+                icon: Monitor
+            },
+            {
+                id: 15,
+                type: 'split',
+                title: "घटना 2: सत्य की खोज",
+                content: [
+                "दयानंद का घर छोड़कर भाग जाना।",
+                "जंगलों, गुफाओं और तीर्थों में भटकना।",
+                "प्रश्न: 'भगवान क्या है? सत्य क्या है?'"
+                ],
+                explanation: "यह रोमांच (Adventure) लेखक के बालमन को बहुत आकर्षित करता था। उन्हें यह किसी नायक की कहानी लगती थी।",
+                image: "10.jpg",
+                color: "from-teal-950 to-slate-900",
+                accent: "text-teal-400",
+                icon: Compass
+            },
+            {
+                id: 16,
+                type: 'card',
+                title: "घटना 3: क्षमा और करुणा",
+                content: [
+                "दयानंद को रसोइए ने काँच पीसकर ज़हर दिया।",
+                "दयानंद ने उसे दंड देने के बजाय क्षमा कर दिया और धन देकर भगा दिया।",
+                "सार: 'अपने से हारे को सहारा देना'।"
+                ],
+                explanation: "इस घटना ने लेखक के मन में मानवीय मूल्यों और करुणा के बीज बोए।",
+                color: "from-pink-950 to-slate-900",
+                accent: "text-pink-400",
+                icon: Droplet
+            },
+
+            // --- PART 4: Education & Success ---
+            {
+                id: 17,
+                type: 'grid',
+                title: "शिक्षा पर माता-पिता का द्वंद्व",
+                content: [
+                "माँ की चिंता: 'लड़का कोर्स की किताबें नहीं पढ़ता, पास कैसे होगा?'",
+                "डर: 'कहीं यह भी साधु बनकर घर से भाग गया तो?'",
+                "पिता का विश्वास: 'जीवन में यही (बाहरी) पढ़ाई काम आएगी।'"
+                ],
+                explanation: "माँ व्यावहारिक चिंता कर रही थीं, जबकि पिता दूरदर्शी थे। वे जानते थे कि असली ज्ञान पाठ्यपुस्तकों से बाहर है।",
+                color: "from-fuchsia-950 to-slate-900",
+                accent: "text-fuchsia-400",
+                icon: Users
+            },
+            {
+                id: 18,
+                type: 'list',
+                title: "आरंभिक शिक्षा: घर से स्कूल तक",
+                content: [
+                "कक्षा 2 तक घर पर ही मास्टर रखा गया।",
+                "कारण: पिता नहीं चाहते थे कि कम उम्र में गलत संगति में पड़ूँ।",
+                "कक्षा 3 में पहली बार स्कूल में दाखिला हुआ।"
+                ],
+                explanation: "पिता चाहते थे कि बच्चे के संस्कार पक्के हो जाएं, तभी वह बाहरी दुनिया में कदम रखे।",
+                color: "from-indigo-900 to-slate-900",
+                accent: "text-indigo-400",
+                icon: GraduationCap
+            },
+            {
+                id: 19,
+                type: 'hero_alt',
+                title: "पिता का वादा और आशीर्वाद",
+                subtitle: "लोकनाथ की दुकान पर",
+                content: ["पिता ने मिट्टी के कुल्हड़ में अनार का शरबत पिलाया।", "सिर पर हाथ रखकर वादा लिया: 'माँ की चिंता मिटाओगे।'"],
+                explanation: "यह एक भावनात्मक अनुबंध था। पिता ने डांटने के बजाय प्रेम और विश्वास के माध्यम से बच्चे को जिम्मेदारी का अहसास कराया।",
+                image: "11.jpg",
+                color: "from-orange-900 to-slate-900",
+                accent: "text-orange-500",
+                icon: Sun
+            },
+            {
+                id: 20,
+                type: 'card',
+                title: "अकादमिक सफलता",
+                content: [
+                "लेखक ने जी-तोड़ मेहनत की।",
+                "कक्षा 3 और 4 में अच्छे नंबर आए।",
+                "कक्षा 5 में 'फर्स्ट' (First) आए और अंग्रेज़ी में सर्वाधिक अंक मिले।"
+                ],
+                explanation: "पिता के विश्वास ने जादू जैसा काम किया। यह सफलता उनके आत्मविश्वास की नींव बनी।",
+                color: "from-green-950 to-slate-900",
+                accent: "text-green-400",
+                icon: Award
+            },
+
+            // --- PART 5: The First Library ---
+            {
+                id: 21,
+                type: 'split',
+                title: "इनाम में मिलीं दो किताबें",
+                content: [
+                "अंग्रेज़ी में नंबर सबसे ज़्यादा थे, इसलिए स्कूल ने दो अंग्रेज़ी किताबें इनाम में दीं।",
+                "ये किताबें कोर्स की नहीं, बल्कि ज्ञानवर्धक थीं।",
+                "1. पक्षियों की दुनिया। 2. पानी के जहाज़।"
+                ],
+                explanation: "ये दो किताबें लेखक की निजी लाइब्रेरी की पहली ईंटें साबित हुईं।",
+                color: "from-blue-900 to-slate-900",
+                accent: "text-blue-400",
+                icon: Book
+            },
+            {
+                id: 22,
+                type: 'split_reverse',
+                title: "किताब 1: पक्षियों का संसार",
+                content: [
+                "कहानी: दो बच्चे घोंसलों की खोज में बागों में भटकते हैं।",
+                "ज्ञान: पक्षियों की जातियाँ, बोलियाँ और आदतें।",
+                "प्रभाव: प्रकृति के प्रति जिज्ञासा जगी।"
+                ],
+                explanation: "इस किताब ने लेखक को कमरे से बाहर निकलकर प्रकृति को देखने की दृष्टि दी।",
+                image: "12.jpg",
+                color: "from-sky-950 to-slate-900",
+                accent: "text-sky-400",
+                icon: Cloud
+            },
+            {
+                id: 23,
+                type: 'split',
+                title: "किताब 2: ट्रस्टी द रग (Trusty the Rug)",
+                content: [
+                "विषय: पानी के जहाज़ों और नाविकों की ज़िंदगी।",
+                "ज्ञान: व्हेल, शार्क, द्वीप और समुद्र के रहस्य।",
+                "प्रभाव: दुनिया की विशालता का अहसास।"
+                ],
+                explanation: "इस किताब ने एक छोटे शहर के बच्चे के लिए सात समुद्रों के दरवाजे खोल दिए।",
+                image: "13.jpg",
+                color: "from-cyan-900 to-slate-900",
+                accent: "text-cyan-400",
+                icon: Anchor
+            },
+            {
+                id: 24,
+                type: 'hero_alt',
+                title: "निजी लाइब्रेरी की स्थापना",
+                subtitle: "पिता का ऐतिहासिक वाक्य",
+                content: [
+                "पिता ने अपनी अलमारी का एक खाना खाली किया।",
+                "कहा: 'आज से यह खाना तुम्हारी अपनी किताबों का। यह तुम्हारी अपनी लाइब्रेरी है।'"
+                ],
+                explanation: "यह क्षण लेखक के जीवन का टर्निंग पॉइंट था। उन्हें अपनी एक अलग जगह, अपनी पहचान मिली।",
+                image: "14.jpg",
+                color: "from-purple-950 to-slate-900",
+                accent: "text-purple-400",
+                icon: Library
+            },
+            {
+                id: 25,
+                type: 'list',
+                title: "पुस्तकालय का विस्तार",
+                content: [
+                    "बच्चा किशोर हुआ, फिर युनिवर्सिटी गया, फिर डॉक्टरेट की।",
+                    "जैसे-जैसे उम्र बढ़ी, लाइब्रेरी भी बड़ी होती गई।",
+                    "इलाहाबाद से बंबई तक का सफर किताबों के साथ तय हुआ।"
+                ],
+                explanation: "लाइब्रेरी केवल बचपन का शौक नहीं रही, बल्कि जीवन भर की साथी बन गई।",
+                color: "from-indigo-950 to-slate-900",
+                accent: "text-indigo-400",
+                icon: BookOpen
+            },
+
+            // --- PART 6: Struggle & Reading Culture ---
+            {
+                id: 26,
+                type: 'grid',
+                title: "इलाहाबाद: पुस्तकालयों का शहर",
+                content: [
+                "पब्लिक लाइब्रेरी (ईस्ट इंडिया कंपनी द्वारा स्थापित)।",
+                "भारती भवन (मदनमोहन मालवीय द्वारा स्थापित)।",
+                "हर मोहल्ले और घर में निजी लाइब्रेरी का चलन।"
+                ],
+                explanation: "इलाहाबाद के माहौल ने लेखक के शौक को और हवा दी। वहाँ पढ़ना एक संस्कृति थी।",
+                color: "from-slate-800 to-slate-900",
+                accent: "text-slate-400",
+                icon: MapPin
+            },
+            {
+                id: 27,
+                type: 'split',
+                title: "पिता की मृत्यु और आर्थिक संकट",
+                content: [
+                "पिता के देहावसान के बाद घोर गरीबी आ गई।",
+                "फीस जुटाना मुश्किल था, शौक की किताबें खरीदना असंभव।",
+                "ट्रस्ट से मिली सहायता से कोर्स की किताबें आती थीं।"
+                ],
+                explanation: "शौक और हकीकत के बीच संघर्ष शुरू हुआ। लेकिन पढ़ने की लत ने रास्ता निकाल ही लिया।",
+                color: "from-red-900 to-slate-900",
+                accent: "text-red-400",
+                icon: XCircle
+            },
+            {
+                id: 28,
+                type: 'card',
+                title: "पुराने किताबों का चक्र",
+                content: [
+                    "लेखक 'सेकंड-हैंड' किताबें खरीदते थे।",
+                    "बाकी किताबें सहपाठियों से लेकर नोट्स बनाते।",
+                    "परीक्षा के बाद अपनी पुरानी किताबें बेचकर नई कक्षा की किताबें खरीदते।"
+                ],
+                explanation: "यह संघर्ष बताता है कि शिक्षा पाने के लिए उन्होंने कितना परिश्रम किया।",
+                color: "from-stone-900 to-slate-900",
+                accent: "text-stone-300",
+                icon: DollarSign
+            },
+            {
+                id: 29,
+                type: 'card',
+                title: "'हरि भवन' में पठन",
+                content: [
+                "मुहल्ले की लाइब्रेरी में चंदा देने के पैसे नहीं थे।",
+                "लेखक वहीं बैठकर घंटों किताबें पढ़ते।",
+                "विश्व साहित्य से परिचय: टालस्टाय, ह्यूगो, गोर्की।"
+                ],
+                explanation: "अभाव ने उन्हें रोका नहीं। घर न ला पाने की कसक थी, पर ज्ञान प्राप्ति में कोई बाधा नहीं थी।",
+                color: "from-emerald-900 to-slate-900",
+                accent: "text-emerald-400",
+                icon: BookOpen
+            },
+            {
+                id: 30,
+                type: 'split',
+                title: "विश्व साहित्य का खजाना",
+                content: [
+                    "लेखक ने हिंदी अनुवादों के माध्यम से दुनिया को जाना।",
+                    "प्रमुख रचनाएँ: अन्ना करेनिना, पेरिस का कुबड़ा, मदर, विचित्र वीर (डॉन क्विक्ज़ोट)।",
+                    "यह अनुभव रोमांचक था।"
+                ],
+                explanation: "हिंदी के माध्यम से ही उन्होंने पूरी दुनिया के साहित्य और संस्कृति की यात्रा की।",
+                color: "from-sky-900 to-slate-900",
+                accent: "text-sky-300",
+                icon: Monitor
+            },
+            {
+                id: 31,
+                type: 'quote',
+                title: "एक अधूरी कसक",
+                quote: "काश! इतने पैसे होते कि किताब खरीद पाता।",
+                content: [
+                    "लाइब्रेरी बंद होने पर उठने का मन नहीं करता था।",
+                    "अधूरे उपन्यास को छोड़कर जाना बहुत कष्टदायी था।"
+                ],
+                explanation: "यही कसक आगे चलकर उनके विशाल निजी पुस्तकालय के निर्माण की प्रेरणा बनी।",
+                color: "from-gray-900 to-slate-900",
+                accent: "text-gray-400",
+                icon: Star
+            },
+
+            // --- PART 7: The Devdas Incident ---
+            {
+                id: 32,
+                type: 'split_reverse',
+                title: "'देवदास' फिल्म का प्रलोभन",
+                content: [
+                "इंटरमीडिएट पास करने के बाद पुरानी किताबें बेचकर 2 रुपये बचाए।",
+                "सिनेमाघर में 'देवदास' (के.एल. सहगल) लगी थी।",
+                "गाना 'दुख के दिन बीतत नाहीं' लेखक को बहुत पसंद था।"
+                ],
+                explanation: "यह युवावस्था का आकर्षण था। संगीत और सिनेमा का जादू उन्हें खींच रहा था।",
+                image: "15.jpg",
+                color: "from-yellow-900 to-slate-900",
+                accent: "text-yellow-500",
+                icon: Film
+            },
+            {
+                id: 33,
+                type: 'quote',
+                title: "माँ की अनुमति और प्रेम",
+                quote: "जाकर पिक्चर देख आ। पैसे मैं दे दूँगी।",
+                content: ["माँ सिनेमा को 'बिगाड़ने वाला' मानती थीं।", "पर बेटे का उदास मन देखकर उन्होंने अपने सिद्धांतों से समझौता किया।"],
+                explanation: "यह माँ के निस्वार्थ प्रेम का प्रतीक है। वे बेटे की खुशी के लिए अपनी मान्यताओं को भी छोड़ने को तैयार थीं।",
+                color: "from-pink-950 to-slate-900",
+                accent: "text-pink-400",
+                icon: Heart
+            },
+            {
+                id: 34,
+                type: 'split',
+                title: "किताब की दुकान पर निर्णय",
+                content: [
+                "सिनेमाघर के रास्ते में किताब की दुकान थी।",
+                "काउंटर पर शरत्चंद्र चट्टोपाध्याय का उपन्यास 'देवदास' देखा।",
+                "दाम: केवल 10 आने (पिक्चर के टिकट से सस्ता)।"
+                ],
+                explanation: "यहाँ लेखक के संस्कारों की जीत हुई। उन्होंने क्षणिक मनोरंजन (फिल्म) के बजाय स्थायी ज्ञान (किताब) को चुना।",
+                color: "from-blue-800 to-slate-900",
+                accent: "text-blue-300",
+                icon: Ticket
+            },
+            {
+                id: 35,
+                type: 'card',
+                title: "पुस्तक विक्रेता का प्रस्ताव",
+                content: [
+                    "दुकानदार ने पहचाना: 'तुम विद्यार्थी हो'।" ,
+                    "ऑफर: 'अपना कमीशन नहीं लूँगा, केवल 10 आने में ले जाओ'।"
+                ],
+                explanation: "किताबों के प्रति उनके प्रेम को दुकानदार ने भी सम्मानित किया।",
+                color: "from-green-900 to-slate-900",
+                accent: "text-green-400",
+                icon: Smile
+            },
+            {
+                id: 36,
+                type: 'hero_alt',
+                title: "पहली खरीद और माँ के आँसू",
+                subtitle: "स्वाभिमान का क्षण",
+                content: [
+                "लेखक ने फिल्म नहीं देखी, किताब खरीदी और बचे पैसे माँ को लौटाए।",
+                "माँ की आँखों में आँसू आ गए।",
+                "यह 'अपने पैसों' से खरीदी गई निजी लाइब्रेरी की पहली किताब थी।"
+                ],
+                explanation: "माँ के आँसू गर्व और राहत के थे। बेटा न केवल 'बिगड़ने' से बच गया, बल्कि उसने परिपक्वता भी दिखाई।",
+                image: "16.jpg",
+                color: "from-rose-900 to-slate-900",
+                accent: "text-rose-400",
+                icon: Smile
+            },
+            {
+                id: 37,
+                type: 'grid',
+                title: "आज का विशाल संग्रह",
+                content: [
+                    "हिंदी-अंग्रेज़ी के उपन्यास, नाटक, जीवनियाँ।",
+                    "इतिहास, कला, पुरातत्त्व, राजनीति।",
+                    "हज़ारहा (हज़ारों) पुस्तकें।"
+                ],
+                explanation: "वह छोटी सी अलमारी आज एक विशाल ज्ञान के सागर में बदल चुकी है।",
+                color: "from-purple-900 to-slate-900",
+                accent: "text-purple-400",
+                icon: Library
+            },
+            {
+                id: 38,
+                type: 'list',
+                title: "महान लेखकों का साथ",
+                content: [
+                    "विदेशी: टालस्टाय, दास्तोवस्की, चेखव, शेक्सपियर।",
+                    "भारतीय: कबीर, तुलसी, सूर, प्रेमचंद, निराला।",
+                    "लेखक इनके बीच खुद को 'भरा-भरा' महसूस करते हैं।"
+                ],
+                explanation: "किताबें निर्जीव वस्तुएं नहीं, बल्कि महान आत्माओं का साक्षात रूप हैं।",
+                color: "from-cyan-950 to-slate-900",
+                accent: "text-cyan-400",
+                icon: Users
+            },
+            {
+                id: 39,
+                type: 'split',
+                title: "विंदा करंदीकर का कथन",
+                content: [
+                    "ऑपरेशन के बाद मराठी कवि विंदा करंदीकर मिलने आए।",
+                    "उन्होंने कहा: 'ये सैकड़ों महापुरुष जो किताबों के रूप में तुम्हारे चारों ओर हैं...'",
+                    "'इन्हीं के आशीर्वाद से तुम बचे हो।'"
+                ],
+                explanation: "यह कथन इस पूरी कहानी का सार है। साहित्य ही संजीवनी है।",
+                color: "from-teal-900 to-slate-900",
+                accent: "text-teal-300",
+                icon: Feather
+            },
+            {
+                id: 40,
+                type: 'hero_large', // NEW TYPE FOR LARGE CONCLUSION IMAGE
+                title: "निष्कर्ष: पुनर्जीवन",
+                subtitle: "पुस्तकालय: एक मंदिर",
+                content: [
+                "लेखक ने मन ही मन उन महापुरुषों को प्रणाम किया।",
+                "पुस्तकालय केवल संग्रह नहीं, जीवन है।"
+                ],
+                explanation: "कहानी का अंत वहीं होता है जहाँ से शुरू हुई थी। पुस्तकें केवल कागज़ नहीं, बल्कि प्राण रक्षक शक्ति हैं।",
+                image: "17.jpg",
+                color: "from-slate-950 to-black",
+                accent: "text-white",
+                icon: Library
+            },
+            // --- PART 8: Thanks/Credits ---
+            {
+                id: 41,
+                type: 'hero',
+                title: "धन्यवाद",
+                subtitle: "प्रस्तुतकर्ता:",
+                content: ["मुरसल", "राम लाल", "अरीब", "शौर्य वीर"],
+                explanation: "इस प्रस्तुति को देखने के लिए आपका धन्यवाद।",
+                color: "from-slate-900 to-emerald-950",
+                accent: "text-emerald-400",
+                icon: Users
+            }
+        ];
+
+        // --- Start Screen Component ---
+        const StartScreen = ({ onStart }) => (
+            <div className="h-screen w-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-slate-900 to-black text-center p-8 animate-fade-in relative overflow-hidden">
+                {/* Background Decoration */}
+                <div className="absolute inset-0 opacity-20 pointer-events-none">
+                    <Library size={400} className="absolute -right-20 -bottom-20 text-blue-900" />
+                    <Feather size={300} className="absolute -left-20 -top-20 text-emerald-900" />
+                </div>
+
+                <div className="z-10 max-w-4xl">
+                    <div className="mb-8 inline-block p-6 rounded-full bg-white/5 border border-white/10 shadow-[0_0_50px_rgba(59,130,246,0.3)]">
+                        <BookOpen size={80} className="text-blue-400" />
+                    </div>
+                    
+                    <h1 className="text-6xl md:text-8xl font-playfair font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-white to-blue-300 mb-6 drop-shadow-2xl">
+                        मेरा छोटा-सा <br /> निजी पुस्तकालय
+                    </h1>
+                    
+                    <p className="text-2xl md:text-3xl text-slate-300 font-hindi mb-12 italic">
+                        धर्मवीर भारती कृत एक मर्मस्पर्शी संस्मरण
+                    </p>
+
+                    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 mb-12 max-w-2xl mx-auto transform hover:scale-105 transition duration-500">
+                        <h3 className="text-xl text-blue-300 uppercase tracking-widest font-bold mb-6 border-b border-white/10 pb-4">प्रस्तुतकर्ता</h3>
+                        <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-left">
+                            <div className="flex items-center gap-3">
+                                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                                <span className="text-xl font-hindi">मुरसल</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                                <span className="text-xl font-hindi">राम लाल</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                                <span className="text-xl font-hindi">अरीब</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                                <span className="text-xl font-hindi">शौर्य वीर</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button 
+                        onClick={onStart}
+                        className="group relative px-12 py-5 bg-blue-600 text-white font-bold rounded-full text-xl shadow-[0_0_30px_rgba(37,99,235,0.5)] hover:shadow-[0_0_50px_rgba(37,99,235,0.8)] hover:bg-blue-500 transition-all duration-300 overflow-hidden"
+                    >
+                        <span className="relative z-10 flex items-center gap-3">
+                            शुरू करें <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                        </span>
+                    </button>
+                </div>
+            </div>
+        );
+
+        // --- Helper: Get Size Classes based on Settings ---
+        const getSizeClasses = (fontSize) => {
+            switch(fontSize) {
+                case 'large':
+                    return {
+                        title: 'text-6xl md:text-8xl',
+                        subTitle: 'text-3xl md:text-4xl',
+                        content: 'text-2xl md:text-3xl',
+                        explanation: 'text-xl'
+                    };
+                case 'xl':
+                    return {
+                        title: 'text-7xl md:text-9xl',
+                        subTitle: 'text-4xl md:text-5xl',
+                        content: 'text-3xl md:text-4xl',
+                        explanation: 'text-2xl'
+                    };
+                case 'normal':
+                default:
+                    return {
+                        title: 'text-5xl md:text-7xl',
+                        subTitle: 'text-2xl md:text-3xl',
+                        content: 'text-xl md:text-2xl',
+                        explanation: 'text-lg'
+                    };
+            }
+        };
+
+        // --- Slide Component ---
+        const BulletPoint = ({ text, accent, fontSize }) => {
+            const sizes = getSizeClasses(fontSize);
+            return (
+                <div className="flex items-start gap-4 mb-4">
+                    <div className={`mt-3 w-2.5 h-2.5 rounded-full shrink-0 shadow-sm ${accent.replace('text-', 'bg-')}`} />
+                    <p className={`${sizes.content} text-slate-200 font-hindi leading-relaxed transition-all duration-300`}>{text}</p>
+                </div>
+            );
+        };
+
+        const SlideContent = ({ slide, fontSize }) => {
+            const Icon = slide.icon;
+            const sizes = getSizeClasses(fontSize);
+
+            // -- Helper for Image or Icon --
+            const Visual = ({ large = false }) => {
+                if (slide.image) {
+                    return (
+                        <div className={`relative w-full ${large ? 'h-full' : 'h-[65vh]'} rounded-2xl overflow-hidden shadow-2xl border border-white/10 group bg-black/50`}>
+                            {/* 1. Blurred Background Image (Fills container) */}
+                            <div className="absolute inset-0">
+                                <img 
+                                    src={slide.image} 
+                                    className="w-full h-full object-cover blur-xl opacity-50 scale-110" 
+                                    aria-hidden="true"
+                                />
+                            </div>
+
+                            {/* 2. Main Image (Fitted, Fully Visible) */}
+                            <img 
+                                src={slide.image} 
+                                alt={slide.title} 
+                                onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                className={`relative w-full h-full object-contain z-10 transition-transform duration-700 ${large ? '' : 'group-hover:scale-105'}`} 
+                            />
+                            
+                            {/* Fallback Div */}
+                            <div className="hidden absolute inset-0 w-full h-full bg-white/10 flex items-center justify-center flex-col z-20">
+                                <ImageIcon size={60} className="mb-2 text-white/50"/>
+                                <span className="text-white/50 text-sm">{slide.image} Missing</span>
+                            </div>
+                        </div>
+                    );
+                }
+                if (Icon) {
+                    return (
+                        <div className={`p-12 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl flex items-center justify-center aspect-square`}>
+                            <Icon size={180} className={`${slide.accent} drop-shadow-2xl opacity-90`} strokeWidth={1} />
+                        </div>
+                    );
+                }
+                return null;
+            };
+
+            // -- Hero Slide --
+            if (slide.type === 'hero') {
+                return (
+                <div className="flex flex-col items-center justify-center h-full text-center p-8 md:p-16">
+                    <div className="mb-8 w-48 h-48 rounded-full overflow-hidden border-4 border-white/10 shadow-2xl relative group bg-white/10 flex items-center justify-center">
+                        {slide.image ? 
+                            <>
+                                <img 
+                                    src={slide.image} 
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                                    onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
+                                />
+                                <div className="hidden w-full h-full items-center justify-center flex-col">
+                                    <ImageIcon className="text-white/50"/>
+                                </div>
+                            </>
+                            : 
+                            <div className="w-full h-full bg-white/10 flex items-center justify-center"><Icon size={80} className={slide.accent} /></div>
+                        }
+                    </div>
+                    <h1 className={`${sizes.title} font-playfair font-bold text-white mb-6 drop-shadow-xl tracking-tight transition-all duration-300`}>{slide.title}</h1>
+                    {slide.subtitle && <h2 className={`${sizes.subTitle} font-hindi italic ${slide.accent} mb-8 opacity-90 transition-all duration-300`}>{slide.subtitle}</h2>}
+                    <div className="max-w-4xl bg-gradient-to-b from-white/10 to-transparent p-6 rounded-xl border-t border-white/20">
+                    {slide.content.map((t, i) => <p key={i} className={`${sizes.content} text-slate-100 font-hindi mb-3 transition-all duration-300`}>{t}</p>)}
+                    {slide.explanation && <p className={`mt-4 ${sizes.explanation} text-slate-400 font-poppins italic border-t border-white/10 pt-4 transition-all duration-300`}>{slide.explanation}</p>}
+                    </div>
+                </div>
+                );
+            }
+
+            // -- NEW: Hero Large Slide (For Conclusion) --
+            if (slide.type === 'hero_large') {
+                return (
+                <div className="flex flex-col items-center justify-center h-full text-center p-8 md:p-16">
+                    <div className="mb-8 w-full max-w-4xl h-[65vh] rounded-2xl overflow-hidden border-4 border-white/10 shadow-2xl relative group bg-white/5">
+                         <Visual large={true} />
+                    </div>
+                    <h1 className={`${sizes.title} font-playfair font-bold text-white mb-4 drop-shadow-xl tracking-tight transition-all duration-300`}>{slide.title}</h1>
+                    <div className="max-w-4xl bg-gradient-to-b from-white/10 to-transparent p-6 rounded-xl border-t border-white/20">
+                        {slide.content.map((t, i) => <p key={i} className={`${sizes.content} text-slate-100 font-hindi mb-3 transition-all duration-300`}>{t}</p>)}
+                    </div>
+                </div>
+                );
+            }
+
+            // -- Hero Alt Slide --
+            if (slide.type === 'hero_alt') {
+                return (
+                <div className="flex flex-col items-center justify-center h-full text-center p-12 relative overflow-hidden">
+                    {/* Background Image Fade */}
+                    {slide.image && <div className="absolute inset-0 opacity-20 pointer-events-none">
+                        <img 
+                            src={slide.image} 
+                            className="w-full h-full object-cover blur-sm scale-110" 
+                            onError={(e) => e.target.style.display='none'}
+                        />
+                    </div>}
+                    
+                    <div className="relative z-10 max-w-5xl">
+                    <div className={`inline-block px-4 py-1 rounded-full border ${slide.accent.replace('text-','border-')} ${slide.accent} mb-6 text-sm font-poppins uppercase tracking-widest`}>प्रमुख घटना</div>
+                    <h1 className={`${sizes.title} font-playfair font-bold text-white mb-6 transition-all duration-300 drop-shadow-lg`}>{slide.title}</h1>
+                    {slide.subtitle && <h3 className={`${sizes.subTitle} font-hindi text-slate-300 mb-8 font-light transition-all duration-300`}>{slide.subtitle}</h3>}
+                    <div className="bg-black/40 backdrop-blur-md p-8 rounded-2xl border-l-4 border-white/30 text-left shadow-2xl">
+                        {slide.content.map((t, i) => <BulletPoint key={i} text={t} accent={slide.accent} fontSize={fontSize} />)}
+                        {slide.explanation && <p className={`mt-6 ${sizes.explanation} text-slate-300 italic font-poppins pl-7 transition-all duration-300`}>{slide.explanation}</p>}
+                    </div>
+                    </div>
+                </div>
+                );
+            }
+
+            // -- Split Layouts --
+            if (slide.type === 'split' || slide.type === 'split_reverse') {
+                return (
+                <div className={`flex flex-col lg:flex-row h-full items-center p-6 lg:p-12 gap-8 ${slide.type === 'split_reverse' ? 'lg:flex-row-reverse' : ''}`}>
+                    <div className="flex-1 space-y-6 lg:space-y-8 w-full">
+                    <div className="flex items-center gap-4 mb-2">
+                        <span className="text-white/40 font-poppins text-sm uppercase tracking-wider bg-white/5 px-3 py-1 rounded-full">स्लाइड {slide.id}</span>
+                    </div>
+                    <h2 className={`${sizes.title} font-playfair font-bold text-white leading-tight transition-all duration-300`}>
+                        {slide.title}
+                    </h2>
+                    <div className="space-y-4">
+                        {slide.content.map((t, i) => <BulletPoint key={i} text={t} accent={slide.accent} fontSize={fontSize} />)}
+                    </div>
+                    {slide.explanation && (
+                        <div className={`bg-white/5 p-6 rounded-xl border-l-4 ${slide.accent.replace('text-', 'border-')}`}>
+                        <p className={`${sizes.explanation} text-slate-300 italic font-poppins transition-all duration-300`}>{slide.explanation}</p>
+                        </div>
+                    )}
+                    </div>
+                    <div className="flex-1 flex justify-center items-center w-full p-4">
+                        <Visual />
+                    </div>
+                </div>
+                );
+            }
+
+            // -- Card/Grid Layouts --
+            if (slide.type === 'card' || slide.type === 'grid' || slide.type === 'list') {
+                return (
+                <div className="flex flex-col h-full p-8 lg:p-16 justify-center">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-12">
+                        {/* Thumbnail Image/Icon */}
+                        <div className="w-24 h-24 rounded-2xl overflow-hidden border border-white/20 shrink-0 bg-white/10 flex items-center justify-center relative">
+                            {slide.image ? 
+                                <>
+                                    <img 
+                                        src={slide.image} 
+                                        className="w-full h-full object-cover" 
+                                        onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
+                                    />
+                                    <div className="hidden w-full h-full items-center justify-center text-white/30"><ImageIcon size={30}/></div>
+                                </>
+                                : 
+                                <div className={`w-full h-full bg-white/10 flex items-center justify-center ${slide.accent}`}><Icon size={40} /></div>
+                            }
+                        </div>
+                        <div>
+                            <h2 className={`${sizes.title} font-playfair font-bold text-white mb-2 transition-all duration-300`}>{slide.title}</h2>
+                            <div className={`h-1 w-24 ${slide.accent.replace('text-', 'bg-')}`}></div>
+                        </div>
+                    </div>
+                    
+                    <div className={`${slide.type === 'grid' ? 'grid grid-cols-1 md:grid-cols-3' : 'flex flex-col'} gap-6`}>
+                    {slide.content.map((t, i) => (
+                        <div key={i} className={`bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/5 hover:bg-white/10 transition duration-300 ${slide.type === 'list' ? 'flex items-center gap-4' : ''}`}>
+                        {slide.type === 'list' && <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-white/10 shrink-0 font-bold ${slide.accent}`}>{i+1}</div>}
+                        <p className={`${sizes.content} text-slate-100 font-hindi leading-relaxed transition-all duration-300`}>{t}</p>
+                        </div>
+                    ))}
+                    </div>
+
+                    {slide.explanation && (
+                    <div className="mt-8 p-6 bg-black/20 rounded-xl border border-white/5 text-center max-w-4xl mx-auto w-full">
+                        <p className={`${sizes.explanation} text-slate-300 font-hindi transition-all duration-300`}>{slide.explanation}</p>
+                    </div>
+                    )}
+                </div>
+                );
+            }
+
+            // -- Quote Slide --
+            if (slide.type === 'quote') {
+                return (
+                <div className="flex flex-col h-full justify-center items-center p-12 text-center relative overflow-hidden">
+                    {/* Image Background for Quote */}
+                    {slide.image && <div className="absolute inset-0 opacity-30 pointer-events-none">
+                        <img 
+                            src={slide.image} 
+                            className="w-full h-full object-cover blur-sm" 
+                            onError={(e) => e.target.style.display='none'}
+                        />
+                        <div className="absolute inset-0 bg-black/60"></div>
+                    </div>}
+
+                    <div className="relative z-10 max-w-6xl">
+                    <div className="text-6xl md:text-8xl text-white/20 font-serif absolute -top-10 -left-10">“</div>
+                    <blockquote className={`${sizes.title} font-hindi leading-tight text-white mb-12 relative z-10 drop-shadow-xl transition-all duration-300`}>
+                        {slide.quote}
+                    </blockquote>
+                    <div className="text-6xl md:text-8xl text-white/20 font-serif absolute -bottom-10 -right-10">”</div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 relative z-10">
+                    {slide.content.map((t, i) => (
+                        <div key={i} className="bg-white/10 backdrop-blur-md px-8 py-4 rounded-full border border-white/20">
+                        <p className={`${sizes.content} font-poppins tracking-wide ${slide.accent} transition-all duration-300`}>{t}</p>
+                        </div>
+                    ))}
+                    </div>
+                    
+                    {slide.explanation && <p className={`mt-12 ${sizes.explanation} text-slate-300 font-poppins italic max-w-2xl transition-all duration-300 relative z-10 bg-black/40 px-4 py-2 rounded-lg`}>{slide.explanation}</p>}
+                </div>
+                );
+            }
+
+            return null;
+        };
+
+        // --- Main App ---
+        const App = () => {
+            const [showStart, setShowStart] = useState(true);
+            const [currentSlide, setCurrentSlide] = useState(0);
+            const [resolution, setResolution] = useState('1440p');
+            const [fontSize, setFontSize] = useState('normal'); // 'normal' | 'large' | 'xl'
+
+            // Navigation
+            const nextSlide = () => setCurrentSlide(p => Math.min(p + 1, SLIDES.length - 1));
+            const prevSlide = () => setCurrentSlide(p => Math.max(p - 1, 0));
+
+            useEffect(() => {
+                const handleKey = (e) => {
+                    if (showStart) return;
+
+                    if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+                    if (e.key === 'ArrowLeft') prevSlide();
+                    
+                    // Resolution Toggles
+                    if (e.key === '+' || e.key === '=') setResolution('1440p');
+                    if (e.key === '-' || e.key === '_') setResolution('1080p');
+
+                    // Font Size Toggle (Cycle 3 levels)
+                    if (e.key.toLowerCase() === 'p') {
+                        setFontSize(prev => {
+                            if (prev === 'normal') return 'large';
+                            if (prev === 'large') return 'xl';
+                            return 'normal';
+                        });
+                    }
+                };
+                window.addEventListener('keydown', handleKey);
+                return () => window.removeEventListener('keydown', handleKey);
+            }, [showStart]);
+
+            // Helper to get font size label
+            const getFontSizeLabel = () => {
+                switch(fontSize) {
+                    case 'large': return 'बड़ा';
+                    case 'xl': return 'सबसे बड़ा';
+                    default: return 'साधारण';
+                }
+            };
+
+            // Show Start Screen Logic
+            if (showStart) {
+                return <StartScreen onStart={() => setShowStart(false)} />;
+            }
+
+            // Presentation Mode
+            const activeSlide = SLIDES[currentSlide];
+
+            return (
+                <div className={`h-screen w-screen overflow-hidden bg-gradient-to-br ${activeSlide.color} transition-all duration-700 ease-in-out relative font-poppins selection:bg-white/30 flex justify-center items-center`}>
+                    
+                    {/* Noise Effect */}
+                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" 
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}>
+                    </div>
+
+                    <main className={`h-full w-full mx-auto relative z-10 flex flex-col transition-all duration-500 ${resolution === '1440p' ? 'max-w-[2560px]' : 'max-w-[1920px] shadow-2xl border-x border-white/5'}`}>
+                        <header className="px-8 py-6 flex justify-between items-center text-white/40 border-b border-white/5 bg-black/10 backdrop-blur-sm">
+                            <div className="text-sm font-bold uppercase hover:text-white transition cursor-default">मेरा छोटा-सा निजी पुस्तकालय</div>
+                            <div className="flex gap-4 items-center">
+                                {/* Font Size Indicator */}
+                                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 text-xs font-mono font-bold tracking-wider opacity-70" title="Press P to toggle size">
+                                    <span className="text-purple-400 font-bold">T</span>
+                                    <span>{getFontSizeLabel()}</span>
+                                </div>
+
+                                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 text-xs font-mono font-bold tracking-wider opacity-70">
+                                    <Monitor size={12} className="text-blue-400" />
+                                    <span>{resolution === '1440p' ? '१४४०p उच्च' : '१०८०p साधारण'}</span>
+                                </div>
+                            </div>
+                        </header>
+
+                        <div className="flex-1 w-full relative overflow-hidden">
+                            <div key={activeSlide.id} className="h-full w-full animate-fade-in-up custom-scroll overflow-y-auto">
+                                <SlideContent slide={activeSlide} fontSize={fontSize} />
+                            </div>
+                        </div>
+
+                        <footer className="px-8 py-6 flex justify-between items-center bg-gradient-to-t from-black/40 to-transparent">
+                            <div className="text-white/60 font-mono text-xl flex items-baseline gap-2">
+                                <span className="text-3xl font-bold text-white">{currentSlide + 1}</span>
+                                <span className="opacity-50 text-sm">/ {SLIDES.length}</span>
+                            </div>
+                            <div className="hidden md:flex flex-1 mx-12 h-1 bg-white/10 rounded-full overflow-hidden">
+                                <div className="h-full bg-white transition-all duration-300 ease-out" style={{ width: `${((currentSlide + 1) / SLIDES.length) * 100}%` }} />
+                            </div>
+                            <div className="flex gap-4">
+                                <button onClick={prevSlide} disabled={currentSlide === 0} className="p-4 rounded-full bg-white/5 hover:bg-white/20 hover:scale-105 active:scale-95 disabled:opacity-30 disabled:scale-100 disabled:cursor-not-allowed transition-all backdrop-blur-md border border-white/10 text-white shadow-lg">
+                                    <ChevronLeft size={28} />
+                                </button>
+                                <button onClick={nextSlide} disabled={currentSlide === SLIDES.length - 1} className="p-4 rounded-full bg-white/5 hover:bg-white/20 hover:scale-105 active:scale-95 disabled:opacity-30 disabled:scale-100 disabled:cursor-not-allowed transition-all backdrop-blur-md border border-white/10 text-white shadow-lg">
+                                    <ChevronRight size={28} />
+                                </button>
+                            </div>
+                        </footer>
+                    </main>
+                    
+                    <style>{`
+                        @keyframes fadeInUp {
+                            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+                            to { opacity: 1; transform: translateY(0) scale(1); }
+                        }
+                        .animate-fade-in-up {
+                            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                        }
+                    `}</style>
+                </div>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
